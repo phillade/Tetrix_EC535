@@ -3,4 +3,4 @@ project(Tetrix_EC535)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(Tetrix_EC535 main.cpp)
+add_executable(Tetrix_EC535 main.cpp block.cpp block.h game.cpp game.h)
