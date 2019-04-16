@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <iostream>
-#include <QTest>
+//#include <QTest>
 
 #include "grid.cpp"
 
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
         newGrid.setCellColor(0,i,"red");
         //w.update();
         app.processEvents();
-        QTest::qSleep(500);
+        usleep(1000000);
     }
 
     return app.exec();

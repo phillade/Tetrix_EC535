@@ -5,14 +5,19 @@
 #include <string.h>
 
 class Grid{
-    int row = 20;
-    int col = 10;
-    int cellSize = 30;
+    int row;
+    int col;
+    int cellSize;
     QFrame * grid[20][10];
-    QFrame * gridWidget = new QFrame();
-    QGridLayout * gridLayout = new QGridLayout(gridWidget);
+    QFrame * gridWidget;
+    QGridLayout * gridLayout;
  public:
     Grid(){
+		  row = 20;
+		  col = 10;
+		  cellSize = 30;
+		  gridWidget = new QFrame();
+		  gridLayout = new QGridLayout(gridWidget);
         gridLayout->setSpacing(0);
         // Create widget for each cell in grid
         for (int i=0; i<row; i++){
