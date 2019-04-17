@@ -5,6 +5,7 @@
 #include <iostream> //everything else
 #include <cstdlib> //for rand
 #include <ctime>
+#include <random>
 
 #ifndef TETRIX_EC535_BLOCK_H
 #define TETRIX_EC535_BLOCK_H
@@ -13,7 +14,7 @@ using namespace std;
 
 class block {
 public:
-    //private variables
+    //Variables
     //The type of the block
     enum type {
         //The explanations to the type of the block is found here
@@ -32,22 +33,30 @@ public:
     block(){
         orientation1 = left;
         type = I;
-        //initialize seed for random generator
-        srand (time(nullptr));
 
         //randomly generate a number 0 to 6 for the seven types of blocks
-        int blockType = random() % 7;
+
+        default_random_engine generator;
+        uniform_int_distribution<int> distribution(0,6);
+        int blockType = distribution(generator);  // generates number in the range 0..6
+        //blockType = distribution(generator);  // generates number in the range 0..6
+
+        cout << blockType << endl;
         switch(blockType){
             case 0:
+                cout << "I" << endl;
                 type = I;
                 break;
             case 1:
+                cout << "J" << endl;
                 type = J;
                 break;
             case 2:
+                cout << "L" << endl;
                 type = L;
                 break;
             case 3:
+                cout << "O" << endl;
                 type = O;
                 break;
             case 4:
