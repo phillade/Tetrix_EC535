@@ -8,16 +8,17 @@ class Grid{
     int row;
     int col;
     int cellSize;
-    QFrame * grid[20][10];
+    QFrame * grid[10][20];
     QFrame * gridWidget;
     QGridLayout * gridLayout;
  public:
     Grid(){
-		  row = 20;
-		  col = 10;
-		  cellSize = 30;
-		  gridWidget = new QFrame();
-		  gridLayout = new QGridLayout(gridWidget);
+        row = 10;
+        col = 20;
+        cellSize = 20;
+        gridWidget = new QFrame();
+        gridLayout = new QGridLayout(gridWidget);
+
         gridLayout->setSpacing(0);
         // Create widget for each cell in grid
         for (int i=0; i<row; i++){
@@ -54,3 +55,5 @@ class Grid{
         grid[rowIdx][colIdx]->setStyleSheet(QString::fromStdString(colorStr));
     }
 };
+
+
