@@ -15,7 +15,7 @@ class Grid{
     Grid(){
         row = 10;
         col = 20;
-        cellSize = 20;
+        cellSize = 18;
         gridWidget = new QFrame();
         gridLayout = new QGridLayout(gridWidget);
 
