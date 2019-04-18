@@ -2,15 +2,17 @@
 #include <QPainter>
 #include <QPixmap>
 #include <string.h>
+#include <sstream>
 
 class Score{
-    int score = 0;
+    int score;
     QLabel * label;
     QPixmap * qmap;
     QPainter * paint;
     QRect * rect;
  public:
     Score(){
+		  score = 0;
         label = new QLabel;
         qmap = new QPixmap(70,90);
         paint = new QPainter(qmap);
@@ -29,7 +31,9 @@ class Score{
         // Rotate
         paint->rotate(-90);
         // Draw text
-        std::string scoreStr = "Score:\n" + std::to_string(score);
+        std::ostringstream ss;
+		  ss << score;
+        std::string scoreStr = "Score:\n" + ss.str();
         paint->drawText(*rect,Qt::AlignCenter,QString::fromStdString(scoreStr));
         label->setPixmap(*qmap);
     }
@@ -43,7 +47,10 @@ class Score{
     }
 
     void setScore(int newScore){
-        std::string scoreStr = "Score:\n" + std::to_string(newScore);
+        score = newScore;
+		  std::ostringstream ss;
+		  ss << newScore;
+        std::string scoreStr = "Score:\n" + ss.str();
         paint->eraseRect(*rect);
         paint->fillRect(*rect, Qt::gray);
         paint->drawText(*rect,Qt::AlignCenter,QString::fromStdString(scoreStr));

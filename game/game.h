@@ -43,7 +43,7 @@ public:
     void inputBlock(block * input, Grid grid){
         //displays the input block on the screen
         //get block type
-        pair<int,int> startPt = {5,0};
+        pair<int,int> startPt(5,0);
         input->coord = grid.placeBlock(input->coord, startPt, input->color);
         input->refPt = startPt;
 
@@ -51,7 +51,7 @@ public:
     };
 
     void rotate(block * input, Grid grid){
-        vector<pair<int,int>> oldCoord = input->coord; // save old coords
+        vector<pair<int, int> > oldCoord = input->coord; // save old coords
         input->rotate(); // rotate coords
         grid.replace(oldCoord, input->coord, input->color);
         //rotate block that is in control
@@ -77,7 +77,7 @@ public:
 
     void translate(block * input, Grid grid){
         //translating speed slow or fast
-        vector<pair<int,int>> newCoord = input->coord;
+        vector<pair<int, int> > newCoord = input->coord;
         for (int i=0; i<newCoord.size(); i++)
             newCoord[i].second = newCoord[i].second + 1;
         grid.replace(input->coord, newCoord, input->color);

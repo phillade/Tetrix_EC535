@@ -62,9 +62,9 @@ class Grid{
         grid[rowIdx][colIdx]->setStyleSheet(QString::fromStdString(colorStr));
     }
 
-    vector<pair<int,int>> placeBlock(vector<pair<int,int>> coord, pair<int,int> loc, string color){
+    vector<pair<int, int> > placeBlock(vector<pair<int, int> > coord, pair<int,int> loc, string color){
         int x, y;
-        vector<pair<int,int>> newCoord;
+        vector<pair<int, int> > newCoord;
         for (int i=0; i<coord.size(); i++){
             x = loc.first + coord[i].first;
             y = loc.second + coord[i].second;
@@ -72,12 +72,12 @@ class Grid{
                 continue;
             setCellColor(x, y, color);
 
-            newCoord.push_back({x, y});
+            newCoord.push_back(make_pair(x, y));
         }
         return newCoord;
     }
 
-    void replace(vector<pair<int,int>> coord, vector<pair<int,int>> newCoord, string color){
+    void replace(vector<pair<int, int> > coord, vector<pair<int, int> > newCoord, string color){
         // Set original coordinates back to gray
         for (int i=0; i<coord.size(); i++){
             if (coord[i].second<0 || coord[i].second>19)

@@ -28,32 +28,43 @@ public:
     Type type;
     int orientation;
     //Orientation orientation;
-	typedef pair<int,int> pairOfInts;
-    vector< pairOfInts > coord;
+    vector<pair<int, int> > coord;
     pair<int,int> refPt;
 
     string color;
 
-    vector<pair<int,int>> blockICoords(){
-        vector< pair <int,int> > coord;
+    vector<pair<int, int> > blockICoords(){
+        vector<pair<int, int> > coord;
         switch(Orientation(orientation))
         {
             case left:
-                coord.insert(coord.end(), {{0,2},{1,2},{2,2},{3,2}});
+					 coord.push_back(make_pair(0,2));
+					 coord.push_back(make_pair(1,2));
+					 coord.push_back(make_pair(2,2));
+					 coord.push_back(make_pair(3,2));
                 break;
             case right:
-                coord.insert(coord.end(), {{0,1},{1, 1},{2,1},{3,1}});
+					 coord.push_back(make_pair(0,1));
+					 coord.push_back(make_pair(1,1));
+					 coord.push_back(make_pair(2,1));
+					 coord.push_back(make_pair(3,1));
                 break;
             case up:
-                coord.insert(coord.end(), {{1,0},{1,1},{1,2},{1,3}});
+					 coord.push_back(make_pair(1,0));
+					 coord.push_back(make_pair(1,1));
+					 coord.push_back(make_pair(1,2));
+					 coord.push_back(make_pair(1,3));
                 break;
             default: // down
-                coord.insert(coord.end(), {{2,0},{2,1},{2,2},{2,3}});
+					 coord.push_back(make_pair(2,0));
+					 coord.push_back(make_pair(2,1));
+					 coord.push_back(make_pair(2,2));
+					 coord.push_back(make_pair(2,3));
         }
         return coord;
     };
 
-    vector<pair<int,int>> getCoordinates(){
+    vector<pair<int, int> > getCoordinates(){
         switch(type)
         {
             case I:
@@ -102,7 +113,7 @@ public:
 
         coord = getCoordinates();
 
-        refPt = {0,0};
+        refPt = make_pair(0,0);
 
     };
 };

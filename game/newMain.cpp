@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     cout << "The type of block is " << thisNewblock.type << endl;
 
     int gameEnd = 1;
-    srand(time(nullptr));
+    srand(time(NULL));
 
     //create a game object
     game Machine = game();
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 ////////////////////////
         //sleep(period);
         //app.processEvents();
-        usleep(1000000)
+        usleep(1000000);
 
     }
     return app->exec();
