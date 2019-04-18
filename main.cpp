@@ -17,10 +17,9 @@ int main() {
     thisNewblock = block();
 
     cout << "The type of block is " << thisNewblock.type << endl;
-    cout << "The orientation of the block is " << thisNewblock.orientation1 << endl;
     cout << "The coordinates of the block is " << thisNewblock.texture << endl;
-    cout << "The coordinates are " << thisNewblock.coordinates.first << ", " << thisNewblock.coordinates.second << endl;
     int gameEnd = 1;
+    srand(time(nullptr));
 
     //create a game object
     game Machine = game();

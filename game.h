@@ -11,9 +11,13 @@
 class game {
     //grid is
     int grid[10][20];
+    //checking if game has ended
     bool gameEnded;
+    //for pausing game
     bool paused;
+
     bool blockInPlay;
+
 public:
     game(){
         //constructor
@@ -33,7 +37,6 @@ public:
     void inputBlock(block input){
         //displays the input block on the screen
         //get block type
-
 
     };
 
@@ -62,6 +65,7 @@ public:
     void translate(){
         //translating speed slow or fast
 
+
     };
 
     int gameSpeed(int * gameEnd){
@@ -85,12 +89,15 @@ public:
             cout << endl;
         }
     };
+
     void pause(){
         paused = true;
     }
+
     void unpause(){
         paused = false;
     }
+
     void update(){
         //run the game
 
@@ -101,6 +108,11 @@ public:
                 // if no block in play, generate a block
                 block NewBlock = block();
                 inputBlock(NewBlock);
+            }
+            else{
+                //block already in play, translate the block down
+                translate();
+
             }
         }
 

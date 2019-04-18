@@ -11,9 +11,18 @@
 #define TETRIX_EC535_BLOCK_H
 
 using namespace std;
+struct blockType{
+    pair<int, int> up;
+    pair<int, int> down;
+    pair<int, int> left;
+    pair<int, int> right;
+    int color;
+};
 
 class block {
+
 public:
+
     //Variables
     //The type of the block
     enum type {
@@ -21,42 +30,32 @@ public:
         //https://tetris.fandom.com/wiki/Tetromino
         I, J, L, O, S, T, Z
     };
+
     type type;
+
     enum orientation{
         left, right, up, down
     };
-    orientation orientation1;
+
+    orientation orientation;
+    int color;
+
+
     int texture;
-    std::pair <int, int> coordinates;
 
-    //generates a random block
-    block(){
-        orientation1 = left;
-        type = I;
+    void assignBlockType(int input){
 
-        //randomly generate a number 0 to 6 for the seven types of blocks
-
-        default_random_engine generator;
-        uniform_int_distribution<int> distribution(0,6);
-        int blockType = distribution(generator);  // generates number in the range 0..6
-        //blockType = distribution(generator);  // generates number in the range 0..6
-
-        cout << blockType << endl;
-        switch(blockType){
+        switch(input){
             case 0:
-                cout << "I" << endl;
                 type = I;
                 break;
             case 1:
-                cout << "J" << endl;
                 type = J;
                 break;
             case 2:
-                cout << "L" << endl;
                 type = L;
                 break;
             case 3:
-                cout << "O" << endl;
                 type = O;
                 break;
             case 4:
@@ -72,9 +71,79 @@ public:
                 cout << "You forgot a case" << endl;
         }
 
+    }
+
+    void assignOrientation(int input){
+        switch(input){
+            case 0:
+                orientation = left;
+                break;
+            case 1:
+                orientation = right;
+                break;
+            case 2:
+                orientation = up;
+                break;
+            case 3:
+                orientation = down;
+                break;
+            default:
+                cout << "You forgot a case" << endl;
+        }
+    }
+
+    pair<int,int> * blockICoords(){
+        switch(orientation)
+        {
+            case left:
+                pair<int,int> array[4] = {{0, 2},{1, 2},{2,2},{3,2}};
+                return array;
+        }
+    };
+
+    pair<int,int> * getCoordinates(){
+        pair<int,int> Coord[4];
+        switch(type)
+        {
+            case I:
+                return blockICoords();
+            case L:
+                break;
+            case J:
+                break;
+            case O:
+                break;
+            case S:
+                break;
+            case Z:
+                break;
+            case T:
+                break;
+            default:
+                break;
+        }
+    };
+
+    //generates a random block
+    block(){
+        //constructor
+        orientation = left;
+        type = I;
+
+        //randomly generate a number 0 to 6 for the seven types of blocks
+
+        int blockType = rand()%7;
+        assignBlockType(blockType);
+
+        //generate orientation
+        int randomOrientation = rand()%4;
+        assignOrientation(randomOrientation);
+
+        pair<int, int> coord[4] = getCoordinates();
+
         //randomly generate the type of block here.
         texture = 0;
-        coordinates = std::pair<int, int>(0, 0);
+
     };
 };
 
