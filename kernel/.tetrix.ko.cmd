@@ -1,0 +1,1 @@
+cmd_/ad/eng/users/d/j/djchen/EC535_Project/Tetrix_EC535/kernel/tetrix.ko := arm-linux-ld -EL  -r -o /ad/eng/users/d/j/djchen/EC535_Project/Tetrix_EC535/kernel/tetrix.ko /ad/eng/users/d/j/djchen/EC535_Project/Tetrix_EC535/kernel/tetrix.o /ad/eng/users/d/j/djchen/EC535_Project/Tetrix_EC535/kernel/tetrix.mod.o

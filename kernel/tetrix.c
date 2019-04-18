@@ -43,7 +43,7 @@ struct file_operations tetrix_fops = {
 	read: tetrix_read,
 	write: tetrix_write,
 	open: tetrix_open,
-	release: tetrix_release
+	release: tetrix_release,
 	fasync: tetrix_fasync
 };
 
@@ -61,6 +61,7 @@ struct fasync_struct *async_queue;  /* asynchronous readers */
 static char *tetrix_buffer;
 /* length of the current message */
 static int tetrix_len;
+static char last_button_press[10] = "";
 
 /////////////////////////////
 static unsigned int capacity = 1000;
@@ -69,6 +70,7 @@ static unsigned int capacity = 1000;
 
 irqreturn_t gpio0_irq(int irq, void *dev_id, struct pt_regs *regs)
 {
+	strcpy(last_button_press,"zero");
 	if (async_queue)
 		kill_fasync(&async_queue, SIGIO, POLL_IN);
 	return IRQ_HANDLED;
@@ -76,6 +78,7 @@ irqreturn_t gpio0_irq(int irq, void *dev_id, struct pt_regs *regs)
 
 irqreturn_t gpio1_irq(int irq, void *dev_id, struct pt_regs *regs)
 {	
+	strcpy(last_button_press,"one");
 	if (async_queue)
 		kill_fasync(&async_queue, SIGIO, POLL_IN);
 	return IRQ_HANDLED;
@@ -83,6 +86,7 @@ irqreturn_t gpio1_irq(int irq, void *dev_id, struct pt_regs *regs)
 
 irqreturn_t gpio2_irq(int irq, void *dev_id, struct pt_regs *regs)
 {	
+	strcpy(last_button_press,"two");
 	if (async_queue)
 		kill_fasync(&async_queue, SIGIO, POLL_IN);
 	return IRQ_HANDLED;
@@ -90,6 +94,7 @@ irqreturn_t gpio2_irq(int irq, void *dev_id, struct pt_regs *regs)
 
 irqreturn_t gpio3_irq(int irq, void *dev_id, struct pt_regs *regs)
 {	
+	strcpy(last_button_press,"three");
 	if (async_queue)
 		kill_fasync(&async_queue, SIGIO, POLL_IN);
 	return IRQ_HANDLED;
@@ -190,7 +195,9 @@ static int tetrix_release(struct inode *inode, struct file *filp)
 static ssize_t tetrix_read(struct file *filp, char *buf, 
 							size_t count, loff_t *f_pos)
 { 
-	char buffer[1000] = "";
+	char buffer[64] = "";
+
+	strcpy(buffer, last_button_press);
 	
 	// if position beyond buffer length, STOP PRINTING
 	if (*f_pos >= strlen(buffer)-1)
