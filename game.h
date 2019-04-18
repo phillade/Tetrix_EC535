@@ -3,6 +3,10 @@
 //
 
 #include "block.h"
+#include "grid.cpp"
+#include <QApplication>
+//#include <QTest>
+#include <unistd.h>
 
 #ifndef TETRIX_EC535_GAME_H
 #define TETRIX_EC535_GAME_H
@@ -17,6 +21,8 @@ class game {
     bool paused;
 
     bool blockInPlay;
+
+    block activeBlock;
 
 public:
     game(){
@@ -34,13 +40,20 @@ public:
         }
 
     };
-    void inputBlock(block input){
+    void inputBlock(block * input, Grid grid){
         //displays the input block on the screen
         //get block type
+        pair<int,int> startPt = {5,0};
+        input->coord = grid.placeBlock(input->coord, startPt, input->color);
+        input->refPt = startPt;
+
 
     };
 
-    void rotote(){
+    void rotate(block * input, Grid grid){
+        vector<pair<int,int>> oldCoord = input->coord; // save old coords
+        input->rotate(); // rotate coords
+        grid.replace(oldCoord, input->coord, input->color);
         //rotate block that is in control
     };
 
@@ -62,10 +75,14 @@ public:
 
     };
 
-    void translate(){
+    void translate(block * input, Grid grid){
         //translating speed slow or fast
-
-
+        vector<pair<int,int>> newCoord = input->coord;
+        for (int i=0; i<newCoord.size(); i++)
+            newCoord[i].second = newCoord[i].second + 1;
+        grid.replace(input->coord, newCoord, input->color);
+        input->coord = newCoord; // save new coords
+        input->refPt.second = input->refPt.second+1; // update ref pt
     };
 
     int gameSpeed(int * gameEnd){
@@ -98,21 +115,28 @@ public:
         paused = false;
     }
 
-    void update(){
+    void update(QApplication * app, Grid grid){
         //run the game
 
         if (!paused){
             //run the game
 
-            if(!blockInPlay){
-                // if no block in play, generate a block
-                block NewBlock = block();
-                inputBlock(NewBlock);
+            if(!blockInPlay){ // no block in play
+                // generate block
+                activeBlock = block();
+                // display block on grid
+                inputBlock(&activeBlock, grid);
+                cout << "made block!" << endl;
+                blockInPlay = 1;
             }
             else{
                 //block already in play, translate the block down
-                translate();
-
+                cout << "translated block!" << endl;
+                translate(&activeBlock, grid);
+                app->processEvents();
+                usleep(500000);
+                rotate(&activeBlock, grid);
+                app->processEvents();
             }
         }
 
