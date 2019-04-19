@@ -93,7 +93,7 @@ int main(int argc, char **argv)
 	while (gameEnd){
 		//Machine.displayGrid();
 		//int period = Machine.gameSpeed(&gameEnd);
-		Machine.update(app, newGrid);
+		Machine.update(app, newGrid, 0);
 
 		// end early
 		gameEnd++;
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 			buffer[rd] = '\0';
 			//printf("%s\n", buffer);
 			if(!strcmp(buffer,"one")){
-				Machine.update(app, newGrid, true);			
+				Machine.update(app, newGrid, 1);			
 			}
 			trigger = 0;
 			close(pFile);

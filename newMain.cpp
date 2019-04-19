@@ -3,7 +3,6 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QTimer>
 #include <iostream>
 //#include <QTest>
 #include <unistd.h>
@@ -22,9 +21,6 @@
 #include <fcntl.h>
 
 int trigger = 0;
-game Machine;
-
-void sighandler(int);
 
 int main(int argc, char **argv)
 {
@@ -50,29 +46,6 @@ int main(int argc, char **argv)
 
     main->show();
 
-	//Button stuff
-	int pFile, oflags;
-	int rd;
-
-	struct sigaction action;
-	char buffer[10] = "";
-
-	// Opens to device file
-	pFile = open("/dev/tetrix", O_RDWR);
-	if (pFile < 0) {
-		fprintf (stderr, "tetrix module isn't loaded\n");
-		return 1;
-	}
-
-	// Setup signal handler
-	memset(&action, 0, sizeof(action));
-	action.sa_handler = sighandler;
-	action.sa_flags = SA_SIGINFO;
-	sigemptyset(&action.sa_mask);
-	sigaction(SIGIO, &action, NULL);
-	fcntl(pFile, F_SETOWN, getpid());
-	oflags = fcntl(pFile, F_GETFL);
-	fcntl(pFile, F_SETFL, oflags | FASYNC);
 
     /////////////////////////////////////////////////////////////////////
     ///////////////////////////// Gameplay //////////////////////////////
@@ -87,43 +60,23 @@ int main(int argc, char **argv)
     int gameEnd = 1;
     srand(time(NULL));
 
-    //intialize a game object
-    Machine = game();
+    //create a game object
+    game Machine = game();
 
-	while (gameEnd){
-		//Machine.displayGrid();
-		//int period = Machine.gameSpeed(&gameEnd);
-		Machine.update(app, newGrid);
+    while (gameEnd){
+        //Machine.displayGrid();
+        //int period = Machine.gameSpeed(&gameEnd);
+        Machine.update(app, newGrid);
 
-		// end early
-		gameEnd++;
-		if (gameEnd > 22)
-			gameEnd = 0;
-		////////////////////////
-		//sleep(period);
-		//app.processEvents();
-		usleep(1000000);
+        // end early
+        gameEnd++;
+        if (gameEnd > 22)
+            gameEnd = 0;
+////////////////////////
+        //sleep(period);
+        //app.processEvents();
+        usleep(1000000);
 
-		if(trigger){
-			rd = read(pFile, buffer, 10);
-			buffer[rd] = '\0';
-			//printf("%s\n", buffer);
-			if(!strcmp(buffer,"one")){
-				Machine.update(app, newGrid, true);			
-			}
-			trigger = 0;
-			close(pFile);
-			pFile = open("/dev/tetrix", O_RDWR);
-			fcntl(pFile, F_SETOWN, getpid());
-			oflags = fcntl(pFile, F_GETFL);
-			fcntl(pFile, F_SETFL, oflags | FASYNC);
-		}
-   	}
-	close(pFile);
-	return app->exec();
-}
-
-void sighandler(int signo)
-{
-	trigger = 1;
+    }
+    return app->exec();
 }

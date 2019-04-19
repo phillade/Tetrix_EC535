@@ -115,7 +115,7 @@ public:
         paused = false;
     }
 
-    void update(QApplication * app, Grid grid, bool isRotate = false){
+    void update(QApplication * app, Grid grid){
         //run the game
 
         if (!paused){
@@ -131,14 +131,12 @@ public:
             }
             else{
                 //block already in play, translate the block down
-					 if (!isRotate){
-		             cout << "translated block!" << endl;
-		             translate(&activeBlock, grid);
-		             app->processEvents();
-					 } else {
-		             rotate(&activeBlock, grid);
-		             app->processEvents();
-					}
+                cout << "translated block!" << endl;
+                translate(&activeBlock, grid);
+                app->processEvents();
+                usleep(500000);
+                rotate(&activeBlock, grid);
+                app->processEvents();
             }
         }
 
