@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 
     main->show();
 
-    /*
+    
 	//Button stuff
 	int pFile, oflags;
 	int rd;
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 	fcntl(pFile, F_SETOWN, getpid());
 	oflags = fcntl(pFile, F_GETFL);
 	fcntl(pFile, F_SETFL, oflags | FASYNC);
-    */
+    
 
     /////////////////////////////////////////////////////////////////////
     ///////////////////////////// Gameplay //////////////////////////////
