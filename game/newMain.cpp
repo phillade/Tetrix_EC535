@@ -3,7 +3,6 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QTimer>
 #include <iostream>
 //#include <QTest>
 #include <unistd.h>
@@ -90,28 +89,38 @@ int main(int argc, char **argv)
     //intialize a game object
     Machine = game();
 
+	char parsedButton[10] = "";
+	char parsedTick[10] = "";
+
 	while (gameEnd){
 		//Machine.displayGrid();
 		//int period = Machine.gameSpeed(&gameEnd);
-		Machine.update(app, newGrid);
-
+		//Machine.update(app, newGrid);
+		
 		// end early
+		/*
 		gameEnd++;
 		if (gameEnd > 22)
 			gameEnd = 0;
+		*/
 		////////////////////////
 		//sleep(period);
 		//app.processEvents();
-		usleep(1000000);
+		//usleep(1000000);
 
 		if(trigger){
+			trigger = 0;
 			rd = read(pFile, buffer, 10);
 			buffer[rd] = '\0';
 			//printf("%s\n", buffer);
-			if(!strcmp(buffer,"one")){
+			sscanf(buffer, "%s %s",parsedButton, parsedTick);
+			if(!strcmp(parsedButton,"one")){
 				Machine.update(app, newGrid, true);			
 			}
-			trigger = 0;
+			else if(!strcmp(parsedTick,"tick")){
+				Machine.update(app, newGrid);
+			}
+			
 			close(pFile);
 			pFile = open("/dev/tetrix", O_RDWR);
 			fcntl(pFile, F_SETOWN, getpid());
@@ -127,3 +136,4 @@ void sighandler(int signo)
 {
 	trigger = 1;
 }
+
