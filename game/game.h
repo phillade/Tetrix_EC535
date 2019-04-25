@@ -5,16 +5,19 @@
 #include "block.h"
 #include "grid.cpp"
 #include <QApplication>
-//#include <QTest>
-#include <unistd.h>
+#include <QTest>
+//#include <unistd.h>
 
 #ifndef TETRIX_EC535_GAME_H
 #define TETRIX_EC535_GAME_H
 
-
 class game {
-    //grid is
-    int grid[10][20];
+    // occupancy of each cell in grid
+    int state[10][20];
+    // color of each cell in grid
+    int colorState[10][20];
+    // number of filled blocks for each row
+    int rowState[20];
     //checking if game has ended
     bool gameEnded;
     //for pausing game
@@ -24,6 +27,10 @@ class game {
 
     block activeBlock;
 
+    bool rowToRemove = false;
+
+    string Color[8] = {"lightgray", "red", "blue", "green", "yellow", "purple","black", "orange"};
+
 public:
     game(){
         //constructor
@@ -31,59 +38,174 @@ public:
         //game starts
         gameEnded = false;
         paused = false;
-        //Game colors
+        //Grid occupancy and colors
         for (int i = 0; i < 10; i++){
             for(int j = 0; j < 20; j++){
-                grid[i][j] = 0;
-                //set default color to zero. There are seven predefined colors.
+                state[i][j] = 0;
+                colorState[i][j] = 0;
             }
         }
 
-    };
-    void inputBlock(block * input, Grid grid){
-        //displays the input block on the screen
-        //get block type
-        pair<int,int> startPt(5,0);
-        input->coord = grid.placeBlock(input->coord, startPt, input->color);
-        input->refPt = startPt;
-
+        // No blocks in any rows at start of game
+        for (int i=0; i<20; i++)
+            rowState[i] = 0;
 
     };
 
-    void rotate(block * input, Grid grid){
-        vector<pair<int, int> > oldCoord = input->coord; // save old coords
-        input->rotate(); // rotate coords
-        grid.replace(oldCoord, input->coord, input->color);
-        //rotate block that is in control
+    void rotate(block * input, Grid grid, int direction){
+        /* direction = 0 : rotate right
+         * direction = 1 : rotate left
+         */
+        // Get new orientation
+        vector<pair<int, int> > rotatedCoord = input->getRotateCoord(direction);
+        bool boundCheck = checkBoundary(rotatedCoord); // Check if pass boundary restrictions
+        if (boundCheck){
+            int ori = input->rotateOrientation(input->orientation, direction); // get orientation after rotate
+            grid.replaceBlock(input->coord, rotatedCoord, Color[input->color]); // rotate block in grid
+            input->setBlock(ori, rotatedCoord); // save new orientation and rotated coords
+        }
     };
 
-    void checkBelow(){
-        //checks whether the lock has is the bottom level yet
+    void installBlock(vector<pair<int, int> > coord, Grid grid){
+        // Record block locations in state
+        bool createNewBlock = false;
+        int x, y;
+        for (int i=0; i<coord.size(); i++){
+            x = coord[i].first;
+            y = coord[i].second;
+            state[x][y] = 1;
+
+            // Update * blocks in rows
+            rowState[y] += 1;
+
+            if (rowState[y] == 10)
+                rowToRemove = true;
+        }
+        //blockInPlay = false; // inactivate block
+        generateNewBlock(grid);
     }
 
-    void updateLines(){
-        //everything
-    };
+    bool checkBoundary(vector<pair<int, int> > coord){
+        // Check if bordering boundary
+        int x, y;
+        for (int i=0; i<coord.size(); i++){
+            x = coord[i].first;
+            y = coord[i].second;
 
-    void checkFilled(){
-        //checks whether or not there is a line that is filled
+            std::cout << x << ", " << y << std::endl;
+            if (state[x][y] == 1 || x >= 10 || x < 0 || y >= 20)
+                return true;
+        }
+        return false;
+    }
 
-    };
-
-    void updateGrid(){
-        //updates the grid. if there is a filled line, it translates all the blocks above the cleared lines down.
-
-    };
-
-    void translate(block * input, Grid grid){
-        //translating speed slow or fast
-        vector<pair<int, int> > newCoord = input->coord;
-        for (int i=0; i<newCoord.size(); i++)
+    void translateY(block * input, Grid grid){
+        // translating speed slow or fast
+        vector<pair<int, int> > newCoord = input->coord; // translated coords
+        vector<pair<int, int> > newCoord2 = input->coord; // coords translated twice to check boundary
+        for (int i=0; i<newCoord.size(); i++){
             newCoord[i].second = newCoord[i].second + 1;
-        grid.replace(input->coord, newCoord, input->color);
+            newCoord2[i].second = newCoord2[i].second + 2;
+        }
+
+        // Translate block down in grid
+        grid.replaceBlock(input->coord, newCoord, Color[input->color]);
         input->coord = newCoord; // save new coords
-        input->refPt.second = input->refPt.second+1; // update ref pt
+        input->refPt.second = input->refPt.second+1; // update block's ref pt
+
+        // Check if translated coords border boundary
+        bool boundCheck = checkBoundary(newCoord2); // check overlap
+        if (boundCheck) // if bordering boundary, install block in state array
+            installBlock(newCoord, grid); // installs block in grid & makes new block
     };
+
+    void translateX(block * input, Grid grid, int direction){
+        /*
+         * direction = 0 : right
+         * direction = 1 : left
+         */
+        // translating speed slow or fast
+        vector<pair<int, int> > newCoord = input->coord; // translated coords
+
+        // Set increment direction
+        int increment;
+        if (direction == 0)
+            increment = 1;
+        else
+            increment = -1;
+        // Calculate coords
+        for (int i=0; i<newCoord.size(); i++){
+            newCoord[i].first = newCoord[i].first + increment;
+        }
+
+        // Check if translated coords border boundary
+        bool boundCheck = checkBoundary(newCoord); // check overlap
+        if (boundCheck) // if bordering boundary, do nothing
+            return;
+
+        // Translate horizontally in grid
+        grid.replaceBlock(input->coord, newCoord, Color[input->color]);
+        input->coord = newCoord; // save new coords
+        input->refPt.first = input->refPt.first+increment; // update block's ref pt
+
+    };
+
+    void rowRemoval(Grid grid){
+        int numChanges = 0;
+        int newState[10][20];
+        int newColorState[10][20];
+
+        vector<int> rowsToDelete;
+        // New locations of rows
+        int newRowLoc[20];
+        for(int i=0; i<20; i++)
+            newRowLoc[i] = i;
+
+        // Find new row assignments
+        for (int i=0; i < 20; i++){
+            if (rowState[i] == 10){ // row filled
+                // delete row
+                rowState[i] = 0;
+                rowsToDelete.push_back(i);
+                newRowLoc[i] = -1;
+                // Record new row locations of rows that will be shifted down
+                for (int j=i+1; j<20; j++){ // only shift rows above deleted row
+                    if (newRowLoc[j] == -1)
+                        continue;
+                    newRowLoc[j] -= 1;
+                }
+            }
+        }
+
+        // Create new state and new color state based on new row assignments
+        int newRow;
+        for (int i=0; i<20; i++){
+            if (newRowLoc[i] == -1){ // clear row
+                for (int j=0; j<10; j++){
+                    newState[j][i] = 0;
+                    newColorState[j][i] = 0;
+                }
+            } else { // copy row to new grid
+                newRow = newRowLoc[i];
+                for (int j=0; j<10; j++){
+                    newState[j][newRow] = state[j][i];
+                    newColorState[j][newRow] = colorState[j][i];
+                }
+            }
+        }
+
+        // Update state and grid
+        for (int i=0; i<10; i++){
+            for (int j=0; j<20; j++){
+                state[i][j] = newState[i][j];
+                colorState[i][j] = newColorState[i][j];
+                // Update grid
+                grid.setCellColor(i,j,Color[colorState[i][j]]);
+            }
+        }
+
+        rowToRemove = false;
+    }
 
     int gameSpeed(int * gameEnd){
 
@@ -101,7 +223,7 @@ public:
     void displayGrid(){
         for (int i = 0; i < 20; i++){
             for (int j = 0; j < 10; j++){
-                cout << grid[j][i] << " ";
+                cout << state[j][i] << " ";
             }
             cout << endl;
         }
@@ -115,6 +237,14 @@ public:
         paused = false;
     }
 
+    void generateNewBlock(Grid grid){
+        activeBlock = block();
+        activeBlock.color = (int) activeBlock.type + 1; // use type of block to index into  Color array
+        // display block on grid
+        grid.placeBlock(activeBlock.coord, Color[activeBlock.color]);
+        cout << "made block!" << endl;
+    }
+
     void update(QApplication * app, Grid grid, bool isRotate = false){
         //run the game
 
@@ -122,26 +252,24 @@ public:
             //run the game
 
             if(!blockInPlay){ // no block in play
-                // generate block
-                activeBlock = block();
-                // display block on grid
-                inputBlock(&activeBlock, grid);
-                cout << "made block!" << endl;
+                generateNewBlock(grid);
                 blockInPlay = 1;
             }
             else{
                 //block already in play, translate the block down
 					 if (!isRotate){
 		             cout << "translated block!" << endl;
-		             translate(&activeBlock, grid);
+                     translateY(&activeBlock, grid);
+                     //translateX(&activeBlock, grid, RIGHT);
+                     app->processEvents();
+                     //rotate(&activeBlock, grid);
 		             app->processEvents();
 					 } else {
-		             rotate(&activeBlock, grid);
+                     //rotate(&activeBlock, grid);
 		             app->processEvents();
 					}
             }
         }
-
     };
 };
 

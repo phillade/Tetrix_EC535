@@ -4,8 +4,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <iostream>
-//#include <QTest>
-#include <unistd.h>
+//#include <unistd.h>
 
 //#include "grid.cpp"
 #include "score.cpp"
@@ -49,6 +48,7 @@ int main(int argc, char **argv)
 
     main->show();
 
+    /*
 	//Button stuff
 	int pFile, oflags;
 	int rd;
@@ -72,6 +72,7 @@ int main(int argc, char **argv)
 	fcntl(pFile, F_SETOWN, getpid());
 	oflags = fcntl(pFile, F_GETFL);
 	fcntl(pFile, F_SETFL, oflags | FASYNC);
+    */
 
     /////////////////////////////////////////////////////////////////////
     ///////////////////////////// Gameplay //////////////////////////////
@@ -95,18 +96,18 @@ int main(int argc, char **argv)
 	while (gameEnd){
 		//Machine.displayGrid();
 		//int period = Machine.gameSpeed(&gameEnd);
+    
 		//Machine.update(app, newGrid);
-		
+
 		// end early
 		/*
 		gameEnd++;
-		if (gameEnd > 22)
+        if (gameEnd > 50)
 			gameEnd = 0;
 		*/
 		////////////////////////
 		//sleep(period);
 		//app.processEvents();
-		//usleep(1000000);
 
 		if(trigger){
 			trigger = 0;
@@ -127,8 +128,9 @@ int main(int argc, char **argv)
 			oflags = fcntl(pFile, F_GETFL);
 			fcntl(pFile, F_SETFL, oflags | FASYNC);
 		}
+        */
    	}
-	close(pFile);
+//	close(pFile);
 	return app->exec();
 }
 
