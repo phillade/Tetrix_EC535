@@ -36,6 +36,7 @@ static ssize_t tetrix_write(struct file *filp,
 static int tetrix_fasync(int fd, struct file *filp, int mode);
 static void tetrix_exit(void);
 static int tetrix_init(void);
+static void mytimer_callback(unsigned long data);
 
 /* Structure that declares the usual file */
 /* access functions */
@@ -55,6 +56,9 @@ module_exit(tetrix_exit);
 /* Major number */
 static int tetrix_major = 61;
 
+static struct timer_list my_timer;
+static int tick_time = 100;
+
 struct fasync_struct *async_queue;  /* asynchronous readers */
 
 /* Buffer to store data */
@@ -62,6 +66,10 @@ static char *tetrix_buffer;
 /* length of the current message */
 static int tetrix_len;
 static char last_button_press[10] = "";
+static char tick_trigger[10] = "";
+
+int active_button = 0;
+int active_tick = 0;
 
 /////////////////////////////
 static unsigned int capacity = 1000;
@@ -71,6 +79,7 @@ static unsigned int capacity = 1000;
 irqreturn_t gpio0_irq(int irq, void *dev_id, struct pt_regs *regs)
 {
 	strcpy(last_button_press,"zero");
+	active_button = 1;
 	if (async_queue)
 		kill_fasync(&async_queue, SIGIO, POLL_IN);
 	return IRQ_HANDLED;
@@ -79,6 +88,7 @@ irqreturn_t gpio0_irq(int irq, void *dev_id, struct pt_regs *regs)
 irqreturn_t gpio1_irq(int irq, void *dev_id, struct pt_regs *regs)
 {	
 	strcpy(last_button_press,"one");
+	active_button = 1;
 	if (async_queue)
 		kill_fasync(&async_queue, SIGIO, POLL_IN);
 	return IRQ_HANDLED;
@@ -87,6 +97,7 @@ irqreturn_t gpio1_irq(int irq, void *dev_id, struct pt_regs *regs)
 irqreturn_t gpio2_irq(int irq, void *dev_id, struct pt_regs *regs)
 {	
 	strcpy(last_button_press,"two");
+	active_button = 1;
 	if (async_queue)
 		kill_fasync(&async_queue, SIGIO, POLL_IN);
 	return IRQ_HANDLED;
@@ -95,6 +106,7 @@ irqreturn_t gpio2_irq(int irq, void *dev_id, struct pt_regs *regs)
 irqreturn_t gpio3_irq(int irq, void *dev_id, struct pt_regs *regs)
 {	
 	strcpy(last_button_press,"three");
+	active_button = 1;
 	if (async_queue)
 		kill_fasync(&async_queue, SIGIO, POLL_IN);
 	return IRQ_HANDLED;
@@ -123,6 +135,12 @@ static int tetrix_init(void)
 	} 
 	memset(tetrix_buffer, 0, capacity);
 	tetrix_len = 0;
+	
+	//Setting up timer
+	
+	setup_timer(&my_timer, mytimer_callback, 0);
+	mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time));
+	
 
 	//Setting up GPIO
 	gpio_direction_input(GPIO_BUTTON_0);
@@ -167,6 +185,7 @@ static void tetrix_exit(void)
 	if (tetrix_buffer)
 	{
 		kfree(tetrix_buffer);
+		del_timer(&my_timer);
 	}
 	
 	/* Releasing interrupts */
@@ -197,8 +216,14 @@ static ssize_t tetrix_read(struct file *filp, char *buf,
 { 
 	char buffer[64] = "";
 
-	strcpy(buffer, last_button_press);
-	
+	//strcpy(buffer, last_button_press);
+
+	if(!active_tick)
+		strcpy(tick_trigger, "blank");
+	if(!active_button)
+		strcpy(last_button_press, "blank");	
+
+	sprintf(buffer, "%s %s", last_button_press, tick_trigger);
 	// if position beyond buffer length, STOP PRINTING
 	if (*f_pos >= strlen(buffer)-1)
 		return 0;
@@ -208,7 +233,9 @@ static ssize_t tetrix_read(struct file *filp, char *buf,
 		printk(KERN_INFO "KERN: Copy to user error!!\n");
 		return -EFAULT;
 	}
-
+	
+	active_tick = 0;
+	active_button = 0;
 	(*f_pos) += (size_t) strlen(buffer);
 	return strlen(buffer);	
 }
@@ -233,6 +260,7 @@ static ssize_t tetrix_write(struct file *filp, const char *buf,
 	}
 
 	// Retrieve first user sequence, ending w/ a space
+	/*
 	char tbuf[256], *tbptr = tbuf;
 	int temp;
 	for (temp = *f_pos; temp < count + *f_pos; temp++){
@@ -240,7 +268,15 @@ static ssize_t tetrix_write(struct file *filp, const char *buf,
 			break;
 		tbptr += sprintf(tbptr, "%c", tetrix_buffer[temp]);
 	}
+	*/
 
+	//Parse data
+	if(!strcmp(tetrix_buffer, "speed up")){
+		tick_time = tick_time - (tick_time / 3);
+		mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time));
+	}else if(!strcmp(tetrix_buffer, "reset")){
+		strcpy(last_button_press,"blank");
+	}
 	
 	(*f_pos) += count;
 	return count;	
@@ -248,5 +284,13 @@ static ssize_t tetrix_write(struct file *filp, const char *buf,
 
 static int tetrix_fasync(int fd, struct file *filp, int mode) {
 	return fasync_helper(fd, filp, mode, &async_queue);
+}
+
+static void mytimer_callback(unsigned long data){
+	strcpy(tick_trigger, "tick");
+	active_tick = 1;
+	if (async_queue)
+		kill_fasync(&async_queue, SIGIO, POLL_IN);
+	mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time));
 }
 
