@@ -104,11 +104,17 @@ public:
     bool checkBoundary(vector<pair<int, int> > coord){
         // Check if bordering boundary
         int x, y;
+        /
         for (int i=0; i<coord.size(); i++){
             x = coord[i].first;
             y = coord[i].second;
+
+            grid.setCellColor(x,y,Color[1]);
+
+            //check bottom of screen
             if (state[x][y] == 1 || x >= 10 || x < 0 || y >= 20)
                 return true;
+
         }
         return false;
     }
@@ -117,6 +123,7 @@ public:
         // translating speed slow or fast
         vector<pair<int, int> > newCoord = input->coord; // translated coords
         vector<pair<int, int> > newCoord2 = input->coord; // coords translated twice to check boundary
+
         for (int i=0; i<newCoord.size(); i++){
             newCoord[i].second = newCoord[i].second + 1;
             newCoord2[i].second = newCoord2[i].second + 2;
