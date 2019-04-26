@@ -39,14 +39,14 @@ int main(int argc, char **argv)
     ////////// Create main widget (widget that is displayed) /////////////////
     QWidget * main = new QWidget();
     // Layout
-    QVBoxLayout* centralLayout = new QVBoxLayout();
+    QHBoxLayout* centralLayout = new QHBoxLayout();
     // Add widgets to layout
     centralLayout->addWidget(gridWidget);
     centralLayout->addWidget(scoreLabel);
     // Add layout to main widget
     main->setLayout(centralLayout);
-
-    main->show();
+	main->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    main->showFullScreen();
 
     
 	//Button stuff
@@ -115,9 +115,23 @@ int main(int argc, char **argv)
 			buffer[rd] = '\0';
 			//printf("%s\n", buffer);
 			sscanf(buffer, "%s %s",parsedButton, parsedTick);
-			if(!strcmp(parsedButton,"one")){
-				Machine.update(app, newGrid, true);			
+			if(!strcmp(parsedButton, "one")){
+				Machine.update(app, newGrid, true, LEFT);			
 			}
+			
+			else if(!strcmp(parsedButton, "zero")){
+				//translate left
+				Machine.update(app, newGrid, false, RIGHT, true, LEFT);
+			}
+			else if(!strcmp(parsedButton, "two")){
+				//translate right
+				Machine.update(app, newGrid, false, RIGHT, true, RIGHT);
+			}
+			else if(!strcmp(parsedButton, "three")){
+				//soft drop
+				Machine.update(app, newGrid, true, RIGHT);
+			}
+			
 			else if(!strcmp(parsedTick,"tick")){
 				Machine.update(app, newGrid);
 			}
@@ -128,7 +142,7 @@ int main(int argc, char **argv)
 			oflags = fcntl(pFile, F_GETFL);
 			fcntl(pFile, F_SETFL, oflags | FASYNC);
 		}
-        */
+        
    	}
 //	close(pFile);
 	return app->exec();

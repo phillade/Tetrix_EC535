@@ -251,7 +251,7 @@ public:
         cout << "made block!" << endl;
     }
 
-    void update(QApplication * app, Grid grid, bool isRotate = false, int rotateDir = RIGHT, bool isXmove = false, int xDir = RIGHT){
+    void update(QApplication * app, Grid grid, bool isRotate = false, int rotateDir = RIGHT, bool xTranslate = false, int xDir = RIGHT){
         //run the game
         if (!paused){
             //run the game
@@ -262,20 +262,16 @@ public:
             }
             else{
                 //block already in play, translate the block down
-				if (isRotate){
-					rotate(&activeBlock, grid, rotateDir);
-				 	app->processEvents();
-				} else if (isXmove){
-					translateX(&activeBlock, grid, xDir);
-					app->processEvents();		
-				} else {
-					 cout << "translated block!" << endl;
-				             translateY(&activeBlock, grid);
-				             app->processEvents();
-				}
-
-	    	}
-		}
+		if (!isRotate){
+		     cout << "translated block!" << endl;
+                     translateY(&activeBlock, grid);
+                     app->processEvents();
+		} else {
+		     rotate(&activeBlock, grid, rotateDir);
+	             app->processEvents();
+        	}
+	    }
+	}
     };
 };
 

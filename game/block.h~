@@ -225,7 +225,7 @@ public:
 
     vector<pair<int, int> > blockZCoords(Orientation ori){
         vector<pair<int, int> > coord;
-        switch(ori)
+        switch(Orientation(orientation))
         {
             case left:
                      coord.push_back(make_pair(0,1));
