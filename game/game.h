@@ -153,28 +153,36 @@ public:
     };
 
     void rowRemoval(Grid grid){
-        int numChanges = 0;
+		int newRowState[20];
         int newState[10][20];
         int newColorState[10][20];
+		int newRowLoc[20];
 
         vector<int> rowsToDelete;
-        // New locations of rows
-        int newRowLoc[20];
-        for(int i=0; i<20; i++)
-            newRowLoc[i] = i;
-
+		
+		// initialize new variables
+		for (int i=0; i<10; i++){
+			for (int j=0; j<20; j++){
+				newState[i][j] = 0;
+				newColorState[i][j] = 0;
+				if (i == 0){
+					newRowLoc[j] = j;
+					newRowState[j] = 0;				
+				}			
+			}		
+		}		
+		
         // Find new row assignments
         for (int i=0; i < 20; i++){
             if (rowState[i] == 10){ // row filled
                 // delete row
-                rowState[i] = 0;
                 rowsToDelete.push_back(i);
                 newRowLoc[i] = -1;
                 // Record new row locations of rows that will be shifted down
                 for (int j=i+1; j<20; j++){ // only shift rows above deleted row
                     if (newRowLoc[j] == -1)
                         continue;
-                    newRowLoc[j] -= 1;
+                    newRowLoc[j] += 1;
                 }
             }
         }
@@ -182,17 +190,13 @@ public:
         // Create new state and new color state based on new row assignments
         int newRow;
         for (int i=0; i<20; i++){
-            if (newRowLoc[i] == -1){ // clear row
-                for (int j=0; j<10; j++){
-                    newState[j][i] = 0;
-                    newColorState[j][i] = 0;
-                }
-            } else { // copy row to new grid
-                newRow = newRowLoc[i];
+			if (newRowLoc[i] != -1){                
+				newRow = newRowLoc[i];
                 for (int j=0; j<10; j++){
                     newState[j][newRow] = state[j][i];
                     newColorState[j][newRow] = colorState[j][i];
                 }
+				newRowState[newRow] = rowState[i];
             }
         }
 
@@ -203,6 +207,8 @@ public:
                 colorState[i][j] = newColorState[i][j];
                 // Update grid
                 grid.setCellColor(i,j,Color[colorState[i][j]]);
+				if (i == 0)
+					rowState[j] = newRowState[j];
             }
         }
 
@@ -269,6 +275,8 @@ public:
 				}
 
 	    	}
+			if (rowToRemove)
+				rowRemoval(grid);
 		}
     };
 };
