@@ -25,6 +25,11 @@ MODULE_LICENSE("Dual BSD/GPL");
 #define GPIO_BUTTON_1 101
 #define GPIO_BUTTON_2 118
 #define GPIO_BUTTON_3 28
+#define GPIO_BUTTON_4 16
+#define GPIO_BUTTON_5 29
+#define GPIO_BUTTON_6 30
+#define GPIO_BUTTON_7 31
+
 
 /* Declaration of memory.c functions */
 static int tetrix_open(struct inode *inode, struct file *filp);
@@ -57,7 +62,6 @@ module_exit(tetrix_exit);
 static int tetrix_major = 61;
 
 static struct timer_list my_timer;
-static int tick_time = 100;
 
 struct fasync_struct *async_queue;  /* asynchronous readers */
 
@@ -70,6 +74,7 @@ static char tick_trigger[10] = "";
 
 int active_button = 0;
 int active_tick = 0;
+int tick_time = 1000;
 
 /////////////////////////////
 static unsigned int capacity = 1000;
@@ -112,6 +117,42 @@ irqreturn_t gpio3_irq(int irq, void *dev_id, struct pt_regs *regs)
 	return IRQ_HANDLED;
 }
 
+irqreturn_t gpio4_irq(int irq, void *dev_id, struct pt_regs *regs)
+{
+	strcpy(last_button_press,"four");
+	active_button = 1;
+	if (async_queue)
+		kill_fasync(&async_queue, SIGIO, POLL_IN);
+	return IRQ_HANDLED;
+}
+
+irqreturn_t gpio5_irq(int irq, void *dev_id, struct pt_regs *regs)
+{	
+	strcpy(last_button_press,"five");
+	active_button = 1;
+	if (async_queue)
+		kill_fasync(&async_queue, SIGIO, POLL_IN);
+	return IRQ_HANDLED;
+}
+
+irqreturn_t gpio6_irq(int irq, void *dev_id, struct pt_regs *regs)
+{	
+	strcpy(last_button_press,"six");
+	active_button = 1;
+	if (async_queue)
+		kill_fasync(&async_queue, SIGIO, POLL_IN);
+	return IRQ_HANDLED;
+}
+
+irqreturn_t gpio7_irq(int irq, void *dev_id, struct pt_regs *regs)
+{	
+	strcpy(last_button_press,"seven");
+	active_button = 1;
+	if (async_queue)
+		kill_fasync(&async_queue, SIGIO, POLL_IN);
+	return IRQ_HANDLED;
+}
+
 static int tetrix_init(void)
 {
 	int result;
@@ -147,12 +188,20 @@ static int tetrix_init(void)
 	gpio_direction_input(GPIO_BUTTON_1);
 	gpio_direction_input(GPIO_BUTTON_2);
 	gpio_direction_input(GPIO_BUTTON_3);
+	gpio_direction_input(GPIO_BUTTON_4);
+	gpio_direction_input(GPIO_BUTTON_5);
+	gpio_direction_input(GPIO_BUTTON_6);
+	gpio_direction_input(GPIO_BUTTON_7);
 
 	//Setting up interrupts
 	int irq0 = IRQ_GPIO(GPIO_BUTTON_0);
 	int irq1 = IRQ_GPIO(GPIO_BUTTON_1);
 	int irq2 = IRQ_GPIO(GPIO_BUTTON_2);
 	int irq3 = IRQ_GPIO(GPIO_BUTTON_3);
+	int irq4 = IRQ_GPIO(GPIO_BUTTON_4);
+	int irq5 = IRQ_GPIO(GPIO_BUTTON_5);
+	int irq6 = IRQ_GPIO(GPIO_BUTTON_6);
+	int irq7 = IRQ_GPIO(GPIO_BUTTON_7);
 
 	if (request_irq(irq0, &gpio0_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
 				"button0", NULL) != 0 || 
@@ -161,11 +210,19 @@ static int tetrix_init(void)
 		request_irq(irq2, &gpio2_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
 				"button2", NULL) != 0 ||
 		request_irq(irq3, &gpio3_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
-				"button3", NULL) != 0) {
+				"button3", NULL) != 0 ||
+		request_irq(irq4, &gpio4_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
+				"button4", NULL) != 0 || 
+	    request_irq(irq5, &gpio5_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
+				"button5", NULL) != 0 ||
+		request_irq(irq6, &gpio6_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
+				"button6", NULL) != 0 ||
+		request_irq(irq7, &gpio7_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
+				"button7", NULL) != 0) {
 		printk ( "irq not acquired \n" );
 		return -1;
     }else{
-		printk ( "irq %d, irq %d, irq %d and irq %d acquired successfully \n", irq0, irq1, irq2, irq3 );
+		printk ( "irq %d, %d, %d, %d, %d, %d, %d and %d acquired successfully \n", irq0, irq1, irq2, irq3, irq4, irq5, irq6, irq7 );
 	}
 
 	printk(KERN_ALERT "Inserting tetrix module\n"); 
@@ -193,6 +250,10 @@ static void tetrix_exit(void)
 	free_irq(IRQ_GPIO(GPIO_BUTTON_1), NULL);
 	free_irq(IRQ_GPIO(GPIO_BUTTON_2), NULL);
 	free_irq(IRQ_GPIO(GPIO_BUTTON_3), NULL);
+	free_irq(IRQ_GPIO(GPIO_BUTTON_4), NULL);
+	free_irq(IRQ_GPIO(GPIO_BUTTON_5), NULL);
+	free_irq(IRQ_GPIO(GPIO_BUTTON_6), NULL);
+	free_irq(IRQ_GPIO(GPIO_BUTTON_7), NULL);
 
 	printk(KERN_ALERT "Removing tetrix module\n");
 
@@ -200,6 +261,7 @@ static void tetrix_exit(void)
 
 static int tetrix_open(struct inode *inode, struct file *filp)
 {
+
 	/* Success */
 	return 0;
 }
@@ -271,9 +333,9 @@ static ssize_t tetrix_write(struct file *filp, const char *buf,
 	*/
 
 	//Parse data
-	if(!strcmp(tetrix_buffer, "speed up")){
+	if(!strcmp(tetrix_buffer, "speed")){
 		tick_time = tick_time - (tick_time / 3);
-		mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time));
+		//mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time));
 	}else if(!strcmp(tetrix_buffer, "reset")){
 		strcpy(last_button_press,"blank");
 	}
