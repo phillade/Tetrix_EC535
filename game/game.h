@@ -64,12 +64,22 @@ public:
          */
         // Get new orientation
         vector<pair<int, int> > rotatedCoord = input->getRotateCoord(direction);
-        bool boundCheck = checkBoundary(rotatedCoord); // Check if pass boundary restrictions
-        if (!boundCheck){
+        bool boundCheck = checkBoundary(rotatedCoord); // Check if can rotate coords
+        if (!boundCheck){ // if pass
             int ori = input->rotateOrientation(input->orientation, direction); // get orientation after rotate
             grid.replaceBlock(input->coord, rotatedCoord, Color[input->color]); // rotate block in grid
             input->setBlock(ori, rotatedCoord); // save new orientation and rotated coords
         }
+
+        // Check if edge touches boundary
+        vector<pair<int, int> > rotatedCoord2 = rotatedCoord;
+        for (int i=0; i<rotatedCoord.size(); i++){
+            rotatedCoord2[i].first = rotatedCoord[i].first + 1;
+            rotatedCoord2[i].second = rotatedCoord[i].second + 1;
+        }
+        bool boundCheck_edge = checkBoundary(rotatedCoord2);
+        if (boundCheck_edge) // if not pass boundary restrictions
+            installBlock(rotatedCoord, grid);
     };
 
     void installBlock(vector<pair<int, int> > coord, Grid grid){
@@ -97,8 +107,6 @@ public:
         for (int i=0; i<coord.size(); i++){
             x = coord[i].first;
             y = coord[i].second;
-
-            std::cout << x << ", " << y << std::endl;
             if (state[x][y] == 1 || x >= 10 || x < 0 || y >= 20)
                 return true;
         }
@@ -248,7 +256,6 @@ public:
         activeBlock.color = (int) activeBlock.type + 1; // use type of block to index into  Color array
         // display block on grid
         grid.placeBlock(activeBlock.coord, Color[activeBlock.color]);
-        cout << "made block!" << endl;
     }
 
     void update(QApplication * app, Grid grid, bool isRotate = false, int rotateDir = RIGHT, bool isXmove = false, int xDir = RIGHT){
@@ -269,9 +276,8 @@ public:
 					translateX(&activeBlock, grid, xDir);
 					app->processEvents();		
 				} else {
-					 cout << "translated block!" << endl;
-				             translateY(&activeBlock, grid);
-				             app->processEvents();
+                    translateY(&activeBlock, grid);
+                    app->processEvents();
 				}
 
 	    	}
