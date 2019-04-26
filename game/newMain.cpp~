@@ -46,7 +46,7 @@ int main(int argc, char **argv)
     // Add layout to main widget
     main->setLayout(centralLayout);
 	main->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-    main->show();
+    main->showFullScreen();
 
     
 	//Button stuff
@@ -94,7 +94,7 @@ int main(int argc, char **argv)
 	char parsedTick[10] = "";
 
 	while (gameEnd){
-		//Machine.displayGrid();
+		Machine.displayGrid();
 		//int period = Machine.gameSpeed(&gameEnd);
     
 		//Machine.update(app, newGrid);
@@ -130,6 +130,9 @@ int main(int argc, char **argv)
 			else if(!strcmp(parsedButton, "three")){
 				//soft drop
 				Machine.update(app, newGrid, true, RIGHT);
+			}
+			else if(!strcmp(parsedButton, "four")){
+				write(pFile, "speed", 5);
 			}
 			
 			else if(!strcmp(parsedTick,"tick")){

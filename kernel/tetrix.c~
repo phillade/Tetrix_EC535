@@ -305,42 +305,21 @@ static ssize_t tetrix_read(struct file *filp, char *buf,
 static ssize_t tetrix_write(struct file *filp, const char *buf,
 							size_t count, loff_t *f_pos)
 {
-	/* end of buffer reached */
-    if (*f_pos >= capacity)
-    {
-        printk(KERN_INFO "write called: process id %d, command %s, count %d, buffer full\n", current->pid, current->comm, count);
-        return -ENOSPC;
-    }
-
-    /* do not go over the end */
-    if (count > capacity - *f_pos)
-        count = capacity - *f_pos;
 
     // Get data from user space
-	if (copy_from_user(tetrix_buffer + *f_pos, buf, count)){
+	if (copy_from_user(tetrix_buffer, buf, count)){
 		return -EFAULT;
 	}
-
-	// Retrieve first user sequence, ending w/ a space
-	/*
-	char tbuf[256], *tbptr = tbuf;
-	int temp;
-	for (temp = *f_pos; temp < count + *f_pos; temp++){
-		if (tetrix_buffer[temp] == ' ' || tetrix_buffer[temp] == '\n')
-			break;
-		tbptr += sprintf(tbptr, "%c", tetrix_buffer[temp]);
-	}
-	*/
 
 	//Parse data
 	if(!strcmp(tetrix_buffer, "speed")){
 		tick_time = tick_time - (tick_time / 3);
-		mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time));
+		printk(KERN_INFO "Current tick: %d", tick_time);
+		//mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time));
 	}else if(!strcmp(tetrix_buffer, "reset")){
 		strcpy(last_button_press,"blank");
 	}
 	
-	(*f_pos) += count;
 	return count;	
 }
 

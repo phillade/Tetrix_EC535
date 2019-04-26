@@ -131,6 +131,9 @@ int main(int argc, char **argv)
 				//soft drop
 				Machine.update(app, newGrid, true, RIGHT);
 			}
+			else if(!strcmp(parsedButton, "four")){
+				write(pFile, "speed", 5);
+			}
 			
 			else if(!strcmp(parsedTick,"tick")){
 				Machine.update(app, newGrid);

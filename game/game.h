@@ -70,16 +70,6 @@ public:
             grid.replaceBlock(input->coord, rotatedCoord, Color[input->color]); // rotate block in grid
             input->setBlock(ori, rotatedCoord); // save new orientation and rotated coords
         }
-
-        // Check if edge touches boundary
-        vector<pair<int, int> > rotatedCoord2 = rotatedCoord;
-        for (int i=0; i<rotatedCoord.size(); i++){
-            rotatedCoord2[i].first = rotatedCoord[i].first + 1;
-            rotatedCoord2[i].second = rotatedCoord[i].second + 1;
-        }
-        bool boundCheck_edge = checkBoundary(rotatedCoord2);
-        if (boundCheck_edge) // if not pass boundary restrictions
-            installBlock(rotatedCoord, grid);
     };
 
     void installBlock(vector<pair<int, int> > coord, Grid grid){
@@ -107,6 +97,7 @@ public:
         for (int i=0; i<coord.size(); i++){
             x = coord[i].first;
             y = coord[i].second;
+
             if (state[x][y] == 1 || x >= 10 || x < 0 || y >= 20)
                 return true;
         }
@@ -116,21 +107,18 @@ public:
     void translateY(block * input, Grid grid){
         // translating speed slow or fast
         vector<pair<int, int> > newCoord = input->coord; // translated coords
-        vector<pair<int, int> > newCoord2 = input->coord; // coords translated twice to check boundary
-        for (int i=0; i<newCoord.size(); i++){
+        for (int i=0; i<newCoord.size(); i++)
             newCoord[i].second = newCoord[i].second + 1;
-            newCoord2[i].second = newCoord2[i].second + 2;
-        }
-
+		
+		bool boundCheck = checkBoundary(newCoord); // check overlap
+        if (boundCheck){ // if bordering boundary, install block in state array
+            installBlock(input->coord, grid); // installs block in state array & makes new block
+			return;
+		}
         // Translate block down in grid
         grid.replaceBlock(input->coord, newCoord, Color[input->color]);
         input->coord = newCoord; // save new coords
         input->refPt.second = input->refPt.second+1; // update block's ref pt
-
-        // Check if translated coords border boundary
-        bool boundCheck = checkBoundary(newCoord2); // check overlap
-        if (boundCheck) // if bordering boundary, install block in state array
-            installBlock(newCoord, grid); // installs block in grid & makes new block
     };
 
     void translateX(block * input, Grid grid, int direction){
