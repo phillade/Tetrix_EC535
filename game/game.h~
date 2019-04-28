@@ -5,8 +5,10 @@
 #include "block.h"
 #include "grid.cpp"
 #include <QApplication>
-
+#include <iostream>
 //#include <unistd.h>
+
+using namespace std;
 
 #ifndef TETRIX_EC535_GAME_H
 #define TETRIX_EC535_GAME_H
@@ -18,8 +20,7 @@ class game {
     int colorState[10][20];
     // number of filled blocks for each row
     int rowState[20];
-    //checking if game has ended
-    bool gameEnded;
+
     //for pausing game
     bool paused;
 
@@ -30,12 +31,19 @@ class game {
     bool rowToRemove;
 
     string Color[8];
+    
+    int rowsRemoved;
 
 public:
+    //checking if game has ended
+
+    bool gameEnded;
+    
     game(){
         //constructor
         blockInPlay = false;
-	rowToRemove = false;
+        rowsRemoved = 0;
+		rowToRemove = false;
         //game starts
         gameEnded = false;
         paused = false;
@@ -57,6 +65,12 @@ public:
             rowState[i] = 0;
 
     };
+    
+    int getRowsRemoved(){
+    	int newRowsRemoved = rowsRemoved;
+    	rowsRemoved = 0;
+    	return newRowsRemoved;
+    }
 
     void rotate(block * input, Grid grid, int direction){
         /* direction = 0 : rotate right
@@ -72,14 +86,15 @@ public:
         }
     };
 
-    void installBlock(vector<pair<int, int> > coord, Grid grid){
+    void installBlock(block * input, Grid grid){
         // Record block locations in state
         bool createNewBlock = false;
         int x, y;
-        for (int i=0; i<coord.size(); i++){
-            x = coord[i].first;
-            y = coord[i].second;
+        for (int i=0; i<input->coord.size(); i++){
+            x = input->coord[i].first;
+            y = input->coord[i].second;
             state[x][y] = 1;
+            colorState[x][y] = input->color;
 
             // Update * blocks in rows
             rowState[y] += 1;
@@ -87,6 +102,13 @@ public:
             if (rowState[y] == 10)
                 rowToRemove = true;
         }
+        
+        // Remove rows if row full
+		if (rowToRemove){
+			std::cout << "Removing a row" << std::endl;
+			rowRemoval(grid);
+		}
+				
         //blockInPlay = false; // inactivate block
         generateNewBlock(grid);
     }
@@ -112,7 +134,7 @@ public:
 		
 		bool boundCheck = checkBoundary(newCoord); // check overlap
         if (boundCheck){ // if bordering boundary, install block in state array
-            installBlock(input->coord, grid); // installs block in state array & makes new block
+            installBlock(input, grid); // installs block in state array & makes new block
 			return;
 		}
         // Translate block down in grid
@@ -159,7 +181,7 @@ public:
 		int newRowLoc[20];
 
         vector<int> rowsToDelete;
-		
+	
 		// initialize new variables
 		for (int i=0; i<10; i++){
 			for (int j=0; j<20; j++){
@@ -179,13 +201,18 @@ public:
                 rowsToDelete.push_back(i);
                 newRowLoc[i] = -1;
                 // Record new row locations of rows that will be shifted down
-                for (int j=i+1; j<20; j++){ // only shift rows above deleted row
-                    if (newRowLoc[j] == -1)
+                for (int j=i-1; j>=0; j--){ // only shift rows above deleted row
+                    if (newRowLoc[j] == -1){
+                    	cout << "inside " << j << endl;
                         continue;
+                        }
                     newRowLoc[j] += 1;
+					cout << "shifting down row " << j << endl;
                 }
             }
         }
+        
+		rowsRemoved = rowsToDelete.size();
 
         // Create new state and new color state based on new row assignments
         int newRow;
@@ -195,6 +222,7 @@ public:
                 for (int j=0; j<10; j++){
                     newState[j][newRow] = state[j][i];
                     newColorState[j][newRow] = colorState[j][i];
+                    cout << Color[colorState[j][i]] << endl; 
                 }
 				newRowState[newRow] = rowState[i];
             }
@@ -223,7 +251,6 @@ public:
             *gameEnd = 1;
         }
 
-
         //hard coded to run every second
         return period;
     };
@@ -248,12 +275,20 @@ public:
     void generateNewBlock(Grid grid){
         activeBlock = block();
         activeBlock.color = (int) activeBlock.type + 1; // use type of block to index into  Color array
+        // check if space is already occupied and end game
+        bool boundCheck = checkBoundary(activeBlock.coord); // check overlap
+        if (boundCheck){
+        	gameEnded = true;
+        }
+        
         // display block on grid
         grid.placeBlock(activeBlock.coord, Color[activeBlock.color]);
     }
 
     void update(QApplication * app, Grid grid, bool isRotate = false, int rotateDir = RIGHT, bool isXmove = false, int xDir = RIGHT){
         //run the game
+        if (gameEnded)
+        	return;
         if (!paused){
             //run the game
 
@@ -275,8 +310,6 @@ public:
 				}
 
 	    	}
-			if (rowToRemove)
-				rowRemoval(grid);
 		}
     };
 };

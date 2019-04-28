@@ -33,8 +33,8 @@ int main(int argc, char **argv)
     QFrame * gridWidget = newGrid.getWidget();
 
     ///////////// Add score box /////////////
-    Score newScore;
-    QLabel * scoreLabel = newScore.getLabel();
+    Score score;
+    QLabel * scoreLabel = score.getLabel();
 
     ////////// Create main widget (widget that is displayed) /////////////////
     QWidget * main = new QWidget();
@@ -92,8 +92,9 @@ int main(int argc, char **argv)
 
 	char parsedButton[10] = "";
 	char parsedTick[10] = "";
-
-	while (gameEnd){
+	int scoreVal = 0;
+	int rowsRemoved = 0;
+	while (!Machine.gameEnded){
 		//Machine.displayGrid();
 		//int period = Machine.gameSpeed(&gameEnd);
     
@@ -137,6 +138,9 @@ int main(int argc, char **argv)
 			
 			else if(!strcmp(parsedTick,"tick")){
 				Machine.update(app, newGrid);
+				rowsRemoved = Machine.getRowsRemoved();
+				if (rowsRemoved > 0)
+					score.setNewScore(rowsRemoved);
 			}
 			
 			close(pFile);
