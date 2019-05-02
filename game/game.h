@@ -46,7 +46,7 @@ public:
         //game starts
         gameEnded = false;
         paused = false;
-	string colorLegend[8] = {"lightgray", "red", "blue", "green", "yellow", "purple","black", "orange"};
+	string colorLegend[8] = {"lightgray", "cyan", "orange", "blue", "yellow", "red","magenta", "green"};
 	for(int i = 0; i < 8; i++){
 		Color[i] = colorLegend[i];
 	}
@@ -356,7 +356,7 @@ public:
             rowState[i] = 0;
 
 
-	}
+	}	
 
 };
 

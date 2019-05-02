@@ -316,7 +316,8 @@ static ssize_t tetrix_write(struct file *filp, const char *buf,
 		memset(tetrix_buffer, 0, capacity);
 		//mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time));
 	}else if(!strcmp(tetrix_buffer, "reset")){
-		strcpy(last_button_press,"blank");
+		tick_time = 1000;
+		memset(tetrix_buffer, 0, capacity);
 	}
 	
 	return count;	

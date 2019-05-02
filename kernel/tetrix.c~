@@ -328,7 +328,7 @@ static int tetrix_fasync(int fd, struct file *filp, int mode) {
 
 static void mytimer_callback(unsigned long data){
 	if(pxa_gpio_get_value(GPIO_BUTTON_2))
-		mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time / 2));
+		mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time / 4));
 	else
 		mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time));
 	

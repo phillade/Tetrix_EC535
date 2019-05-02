@@ -23,6 +23,8 @@
 #include <signal.h>
 #include <fcntl.h>
 
+#define THRESHOLD 1500
+
 int trigger = 0;
 game Machine;
 bool menu_opened = false;
@@ -117,6 +119,8 @@ int main(int argc, char **argv)
 	char parsedTick[10] = "";
 	int scoreVal = 0;
 	int rowsRemoved = 0;
+	write(pFile, "reset", 5);
+	int thislvl = score.getScore() / THRESHOLD;
 	while (!Machine.gameEnded){
 		//Machine.displayGrid();
 		//int period = Machine.gameSpeed(&gameEnd);
@@ -132,6 +136,11 @@ int main(int argc, char **argv)
 		////////////////////////
 		//sleep(period);
 		//app.processEvents();
+
+		if(thislvl != (score.getScore() / THRESHOLD)){
+			thislvl = score.getScore() / THRESHOLD;
+			write(pFile, "speed", 5);
+		}
 
 		if(trigger){
 			trigger = 0;
@@ -155,7 +164,8 @@ int main(int argc, char **argv)
 				Machine.update(app, newGrid, true, RIGHT);
 			}
 			else if(!strcmp(parsedButton, "seven")){
-				write(pFile, "speed", 5);
+				game.restart(newGrid);				
+				write(pFile, "reset", 5);
 			}
 			else if (!strcmp(parsedButton, "zero")){
 				// hard drop
