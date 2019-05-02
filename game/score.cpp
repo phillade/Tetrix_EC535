@@ -61,6 +61,9 @@ class Score{
     	//n 	40 * (n + 1) 	100 * (n + 1) 	300 * (n + 1) 	1200 * (n + 1) 
     	int n = rowsCleared + 1;
     	switch (rowsCleared){
+		case 0:
+			score = 0;
+			break;
     		case 1:
     			score += 40 * n;
     			break;

@@ -21,9 +21,9 @@
 
 MODULE_LICENSE("Dual BSD/GPL");
 
-#define GPIO_BUTTON_0 117
+#define GPIO_BUTTON_0 113
 #define GPIO_BUTTON_1 101
-#define GPIO_BUTTON_2 118
+#define GPIO_BUTTON_2 9
 #define GPIO_BUTTON_3 28
 #define GPIO_BUTTON_4 16
 #define GPIO_BUTTON_5 29
@@ -98,7 +98,7 @@ irqreturn_t gpio1_irq(int irq, void *dev_id, struct pt_regs *regs)
 		kill_fasync(&async_queue, SIGIO, POLL_IN);
 	return IRQ_HANDLED;
 }
-
+/*
 irqreturn_t gpio2_irq(int irq, void *dev_id, struct pt_regs *regs)
 {	
 	strcpy(last_button_press,"two");
@@ -107,7 +107,7 @@ irqreturn_t gpio2_irq(int irq, void *dev_id, struct pt_regs *regs)
 		kill_fasync(&async_queue, SIGIO, POLL_IN);
 	return IRQ_HANDLED;
 }
-
+*/
 irqreturn_t gpio3_irq(int irq, void *dev_id, struct pt_regs *regs)
 {	
 	strcpy(last_button_press,"three");
@@ -196,7 +196,7 @@ static int tetrix_init(void)
 	//Setting up interrupts
 	int irq0 = IRQ_GPIO(GPIO_BUTTON_0);
 	int irq1 = IRQ_GPIO(GPIO_BUTTON_1);
-	int irq2 = IRQ_GPIO(GPIO_BUTTON_2);
+	//int irq2 = IRQ_GPIO(GPIO_BUTTON_2);
 	int irq3 = IRQ_GPIO(GPIO_BUTTON_3);
 	int irq4 = IRQ_GPIO(GPIO_BUTTON_4);
 	int irq5 = IRQ_GPIO(GPIO_BUTTON_5);
@@ -207,13 +207,11 @@ static int tetrix_init(void)
 				"button0", NULL) != 0 || 
 	    request_irq(irq1, &gpio1_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
 				"button1", NULL) != 0 ||
-		request_irq(irq2, &gpio2_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
-				"button2", NULL) != 0 ||
 		request_irq(irq3, &gpio3_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
 				"button3", NULL) != 0 ||
 		request_irq(irq4, &gpio4_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
 				"button4", NULL) != 0 || 
-	    request_irq(irq5, &gpio5_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
+	    	request_irq(irq5, &gpio5_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
 				"button5", NULL) != 0 ||
 		request_irq(irq6, &gpio6_irq, SA_INTERRUPT | SA_TRIGGER_RISING,
 				"button6", NULL) != 0 ||
@@ -222,7 +220,7 @@ static int tetrix_init(void)
 		printk ( "irq not acquired \n" );
 		return -1;
     }else{
-		printk ( "irq %d, %d, %d, %d, %d, %d, %d and %d acquired successfully \n", irq0, irq1, irq2, irq3, irq4, irq5, irq6, irq7 );
+		printk ( "irq %d, %d, %d, %d, %d, %d and %d acquired successfully \n", irq0, irq1, irq3, irq4, irq5, irq6, irq7 );
 	}
 
 	printk(KERN_ALERT "Inserting tetrix module\n"); 
@@ -248,7 +246,7 @@ static void tetrix_exit(void)
 	/* Releasing interrupts */
 	free_irq(IRQ_GPIO(GPIO_BUTTON_0), NULL);
 	free_irq(IRQ_GPIO(GPIO_BUTTON_1), NULL);
-	free_irq(IRQ_GPIO(GPIO_BUTTON_2), NULL);
+	//free_irq(IRQ_GPIO(GPIO_BUTTON_2), NULL);
 	free_irq(IRQ_GPIO(GPIO_BUTTON_3), NULL);
 	free_irq(IRQ_GPIO(GPIO_BUTTON_4), NULL);
 	free_irq(IRQ_GPIO(GPIO_BUTTON_5), NULL);
@@ -329,10 +327,15 @@ static int tetrix_fasync(int fd, struct file *filp, int mode) {
 }
 
 static void mytimer_callback(unsigned long data){
+	if(pxa_gpio_get_value(GPIO_BUTTON_2))
+		mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time / 4));
+	else
+		mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time));
+	
 	strcpy(tick_trigger, "tick");
 	active_tick = 1;
 	if (async_queue)
 		kill_fasync(&async_queue, SIGIO, POLL_IN);
-	mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time));
+	
 }
 
