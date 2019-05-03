@@ -1,7 +1,5 @@
 #include "block.h"
 
-using namespace std;
-
 block::block(){
 	/* 
 	Constructor for class block. Generates a block of random type & orientation.
