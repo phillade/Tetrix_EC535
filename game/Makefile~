@@ -13,17 +13,7 @@ CXX           = arm-linux-g++
 DEFINES       = -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT $(DEFINES)
-INCPATH = -I/ad/eng/courses/ec/ec535/gumstix/oe/cross/arm-angstrom-linux-gnueabi/include/c++ \
-              -I/ad/eng/courses/ec/ec535/gumstix/oe/cross/arm-angstrom-linux-gnueabi/include/c++/arm-angstrom-linux-gnueabi \
-              -I/ad/eng/courses/ec/ec535/gumstix/oe/cross/arm-angstrom-linux-gnueabi/include/c++/backward \
-              -I/ad/eng/courses/ec/ec535/gumstix/oe/cross/arm-angstrom-linux-gnueabi/include/c++/bits \
-              -I/ad/eng/courses/ec/ec535/gumstix/oe/cross/arm-angstrom-linux-gnueabi/include/c++/debug \
-              -I/ad/eng/courses/ec/ec535/gumstix/oe/cross/arm-angstrom-linux-gnueabi/include/c++/ext \
-              -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/include/QtCore \
-              -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/include/QtGui \
-              -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/include/QtNetwork \
-              -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/include \
-              -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/mkspecs/qws/linux-arm-g++ -I. -I. -I. -I.
+INCPATH       = -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/mkspecs/qws/linux-arm-g++ -I. -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/include/QtCore -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/include/QtNetwork -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/include/QtGui -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/include -I/ad/eng/users/p/h/phillipt/Tetrix_EC535/game/. -I. -I. -I.
 LINK          = arm-linux-g++
 LFLAGS        = -Wl,-O1 -Wl,-rpath,/ad/eng/projects/linux/ec535/gumstix/oe/qt/lib
 LIBS          = $(SUBLIBS)  -L/ad/eng/projects/linux/ec535/gumstix/oe/qt/lib -lQtGui -L/ad/eng/projects/linux/ec535/gumstix/oe/qt/lib -lts -lQtNetwork -lQtCore -lz -lm -lrt -ldl -lpthread

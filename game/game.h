@@ -27,6 +27,8 @@ class game {
     bool blockInPlay;
 
     block activeBlock;
+	block waitingBlock;
+	bool hasStarted;
 
     bool rowToRemove;
 
@@ -37,19 +39,19 @@ class game {
 public:
     //checking if game has ended
     bool gameEnded;
-    
+	int mode;
     game(){
         //constructor
+		mode = 0;
+		hasStarted = false;
         blockInPlay = false;
         rowsRemoved = 0;
 		rowToRemove = false;
         //game starts
         gameEnded = false;
         paused = false;
-	string colorLegend[8] = {"lightgray", "cyan", "orange", "blue", "yellow", "red","magenta", "green"};
-	for(int i = 0; i < 8; i++){
-		Color[i] = colorLegend[i];
-	}
+	
+		setColor(mode); // set block colors
 
         //Grid occupancy and colors
         for (int i = 0; i < 10; i++){
@@ -267,9 +269,18 @@ public:
     }
 
     void generateNewBlock(Grid grid){
-        activeBlock = block();
+		if (hasStarted == false){
+			activeBlock = block();
+			waitingBlock = block();
+			hasStarted = true;
+		} else {
+			activeBlock = waitingBlock;
+			waitingBlock = block();
+		}
+        //activeBlock = block();
         activeBlock.color = (int) activeBlock.type + 1; // use type of block to index into  Color array
-        // check if space is already occupied and end game
+		waitingBlock.color = (int) waitingBlock.type + 1;        
+		// check if space is already occupied and end game
         bool boundCheck = checkBoundary(activeBlock.coord); // check overlap
         if (boundCheck){
         	gameEnded = true;
@@ -279,6 +290,14 @@ public:
         grid.placeBlock(activeBlock.coord, Color[activeBlock.color]);
     }
 	
+	vector<pair<int, int> > getNextCoord(){
+		return waitingBlock.zeroedCoord;	
+	}
+
+	string getNextColor(){
+		return Color[waitingBlock.color];	
+	}
+
 	void hardDrop(block * input, Grid grid){
 		int incr = 0;
 		vector<pair<int, int > > tempCoord = input->coord;		
@@ -334,6 +353,21 @@ public:
 		}
     };
 	
+	void setColor(int modeInput){
+			string colorLegend0[8] = {"lightgray", "cyan", "orange", "blue", "yellow", "red","magenta", "green"};
+			string colorLegend1[8] = {"black", "black", "black", "black", "black", "black", "black", "black"};
+			string colorLegend2[8] = {"lightgray", "lightgray", "lightgray", "lightgray", "lightgray", "lightgray", "lightgray", "lightgray"};
+		for(int i = 0; i < 8; i++){
+			if (modeInput == 0)
+				Color[i] = colorLegend0[i];
+			else if (modeInput == 1)
+				Color[i] = colorLegend1[i];
+			else
+				Color[i] = colorLegend2[i];
+		}
+	}
+
+
 	void restart(Grid grid){
 		blockInPlay = false;
         rowsRemoved = 0;
@@ -355,7 +389,7 @@ public:
         for (int i=0; i<20; i++)
             rowState[i] = 0;
 
-
+		setColor(mode);
 	}	
 
 };

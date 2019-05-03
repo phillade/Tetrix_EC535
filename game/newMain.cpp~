@@ -16,6 +16,7 @@
 #include "game.h"
 #include "block.h"
 #include <ctime>
+#include "nextblock.cpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,7 +50,12 @@ int main(int argc, char **argv)
 
     QHBoxLayout* centralLayout = new QHBoxLayout();
 
+    // next block stuff -------------------
+    nextBlock nb;
+    QFrame * nbObj = nb.getWidget();
+
     // Add widgets to layout
+    centralLayout->addWidget(nbObj);
     centralLayout->addWidget(gridWidget);
     centralLayout->addWidget(scoreLabel);
 	
@@ -121,7 +127,14 @@ int main(int argc, char **argv)
 	int rowsRemoved = 0;
 	write(pFile, "reset", 5);
 	int thislvl = score.getScore() / THRESHOLD;
-	while (!Machine.gameEnded){
+	while (true){
+		// next block
+		if (Machine.mode == 2)
+			nb.placeBlock(Machine.getNextCoord(), "red");
+		else
+			nb.placeBlock(Machine.getNextCoord(), Machine.getNextColor());
+
+
 		//Machine.displayGrid();
 		//int period = Machine.gameSpeed(&gameEnd);
     
@@ -164,12 +177,19 @@ int main(int argc, char **argv)
 				Machine.update(app, newGrid, true, RIGHT);
 			}
 			else if(!strcmp(parsedButton, "seven")){
-				game.restart(newGrid);				
+				Machine.restart(newGrid);				
 				write(pFile, "reset", 5);
 			}
 			else if (!strcmp(parsedButton, "zero")){
 				// hard drop
 				Machine.update(app, newGrid, false, RIGHT, false, RIGHT, true);			
+			}
+			else if (!strcmp(parsedButton, "five")){
+				if (Machine.mode == 2)
+					Machine.mode = 0;
+				else
+					Machine.mode++;
+							
 			}
 			else if(!strcmp(parsedTick,"tick")){
 				Machine.update(app, newGrid);

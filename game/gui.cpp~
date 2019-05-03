@@ -33,6 +33,7 @@ Gui::Gui(QWidget *parent)
 void Gui::handleButton()
 {
 	m_button->setText("Example");
+	Machine.restart();
 }
 
 void Gui::setMachine(game* Mach)
@@ -40,10 +41,6 @@ void Gui::setMachine(game* Mach)
 	Machine = *Mach;
 }
 
-void Gui::restart()
-{
-	Machine.restart();
-}
 QPushButton * Gui::getButton()
 {
 	return m_button;

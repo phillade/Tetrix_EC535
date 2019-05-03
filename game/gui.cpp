@@ -33,7 +33,7 @@ Gui::Gui(QWidget *parent)
 void Gui::handleButton()
 {
 	m_button->setText("Example");
-	Machine.restart();
+	//Machine.restart();
 }
 
 void Gui::setMachine(game* Mach)

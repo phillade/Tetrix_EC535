@@ -33,6 +33,8 @@ public:
     int orientation;
     //Orientation orientation;
     vector<pair<int, int> > coord;
+    vector<pair<int, int> > zeroedCoord;
+
     pair<int,int> refPt;
 
     int color;
@@ -327,6 +329,7 @@ public:
         orientation = rand()%4;
 
         coord = getCoordinates(orientation);
+	zeroedCoord = getCoordinates(orientation);
 
         // Default ref pt
         refPt = make_pair(4,-2);
