@@ -1,8 +1,9 @@
+/* Widget that shows the next tetris block to be played */
+
 #include <QWidget>
 #include <QLabel>
 #include <QHBoxLayout>
 #include <string.h>
-
 #include <utility> // for pair
 #include <vector>
 #include <iostream>
@@ -16,10 +17,9 @@ class nextBlock{
     QGridLayout * nextBlockLayout;
  public:
     nextBlock(){
+        // Initialize variables
         cellSize = 11;
-        //nextBlockWidget = new QFrame();
         nextBlockLayout = new QGridLayout(&nextBlockWidget);
-
         nextBlockLayout->setSpacing(0);
         // Create widget for each cell in grid
         for (int i=0; i<4; i++){
@@ -41,23 +41,18 @@ class nextBlock{
     }
 
     QFrame * getWidget(){
+        // Return widget
         return &nextBlockWidget;
     }
 
-    int getCellSize(){
-        return cellSize;
-    }
-
-    void setCellSize(int i){
-        cellSize = i;
-    }
-
     void setCellColor(int rowIdx, int colIdx, string color){
+        // Set cell color 
         string colorStr = "background:"+color+";";
         grid[rowIdx][colIdx]->setStyleSheet(QString::fromStdString(colorStr));
     }
 
     void placeBlock(vector<pair<int, int> > coord, string color){
+        // Place block in next block grid
         for (int i=0; i<4; i++){
             for (int j=0; j<4; j++){
                 setCellColor(i, j, "lightgray");

@@ -1,3 +1,5 @@
+/* Score label that shows the current player score */
+
 #include <QLabel>
 #include <QPainter>
 #include <QPixmap>
@@ -12,24 +14,22 @@ class Score{
     QRect * rect;
  public:
     Score(){
-		score = 0;
+        // Initialize variables
+		score = 0; 
         label = new QLabel;
         qmap = new QPixmap(50,70);
         paint = new QPainter(qmap);
         rect = new QRect(-70,0,70,50); // subtract by 90, switch width and height due to rotate
-
+        // center label
         label->setAlignment(Qt::AlignCenter);
-        // Add frame
-        //label->setFrameStyle(QFrame::Box);
-        //label->setLineWidth(2);
-        // Set size
+        // Set size of label
         label->setFixedSize(50,70);
         label->setStyleSheet("QLabel {background-color : black};");
         // Format font
         paint->setFont( QFont("Arial",20) );
         paint->setPen(Qt::white);
         paint->fillRect(*rect, Qt::black);
-        // Rotate
+        // Rotate 90 degrees
         paint->rotate(-90);
         // Draw text
         std::ostringstream ss;
@@ -40,14 +40,17 @@ class Score{
     }
 
     QLabel * getLabel(){
+        /* Get label widget */
         return label;
     }
 
     int getScore(){
+        /* Get score */
         return score;
     }
 
     void setScore(){
+        /* Set score */
 		std::ostringstream ss;
 		ss << score;
         std::string scoreStr = "Score:\n" + ss.str();
@@ -58,7 +61,7 @@ class Score{
     }
         
 	void setNewScore(int rowsCleared){
-    	//n 	40 * (n + 1) 	100 * (n + 1) 	300 * (n + 1) 	1200 * (n + 1) 
+    	/* Update score */
     	int n = rowsCleared + 1;
     	switch (rowsCleared){
 		case 0:
@@ -81,8 +84,6 @@ class Score{
     	}
     	setScore();    	
     };
-	
-
 };
 
 
