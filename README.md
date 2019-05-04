@@ -1,6 +1,6 @@
 # Tetrix for Gumstix
 
-We recreated Tetris from scratch using the Gumstix board with an lcd screen and hardware buttons. We were able to implement the major features of tetris such as hard drop, soft drop, next block and basic gameplay movement and logic as well as additional features such as color customization. It is a fully functional recreation of a classic game. We developed the game logic from our understanding of the game and did not use any external sources. 
+We recreated Tetris from scratch using the Gumstix board, a lcd screen, and hardware buttons. We implemented basic gameplay movements while allowing customization of the block’s color scheme. The software heavily relies on QT and kernel modules to recreate the grid and block movements found in the original Tetris game. With features, such as hard drop, soft drop, and a next block indicator, Tetrix is a fully functional recreation of the classic game. 
 
 ## Getting Started
 
