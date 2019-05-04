@@ -54,11 +54,9 @@ OBJECTS_DIR   = ./
 
 SOURCES       = block.cpp \
 		game.cpp \
-		gui.cpp \
 		main.cpp moc_gui.cpp
 OBJECTS       = block.o \
 		game.o \
-		gui.o \
 		main.o \
 		moc_gui.o
 DIST          = /ad/eng/courses/ec/ec535/gumstix/oe/qt/mkspecs/common/g++.conf \
@@ -165,7 +163,7 @@ qmake:  FORCE
 
 dist: 
 	@$(CHK_DIR_EXISTS) .tmp/game1.0.0 || $(MKDIR) .tmp/game1.0.0 
-	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/game1.0.0/ && $(COPY_FILE) --parents block.h game.h gui.h grid.cpp score.cpp nextblock.cpp .tmp/game1.0.0/ && $(COPY_FILE) --parents block.cpp game.cpp gui.cpp main.cpp .tmp/game1.0.0/ && (cd `dirname .tmp/game1.0.0` && $(TAR) game1.0.0.tar game1.0.0 && $(COMPRESS) game1.0.0.tar) && $(MOVE) `dirname .tmp/game1.0.0`/game1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/game1.0.0
+	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/game1.0.0/ && $(COPY_FILE) --parents block.h game.h grid.cpp score.cpp nextblock.cpp .tmp/game1.0.0/ && $(COPY_FILE) --parents block.cpp game.cpp gui.cpp main.cpp .tmp/game1.0.0/ && (cd `dirname .tmp/game1.0.0` && $(TAR) game1.0.0.tar game1.0.0 && $(COMPRESS) game1.0.0.tar) && $(MOVE) `dirname .tmp/game1.0.0`/game1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/game1.0.0
 
 
 clean:compiler_clean 

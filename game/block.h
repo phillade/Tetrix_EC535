@@ -1,11 +1,12 @@
-#ifndef TETRIX_EC535_BLOCK_H
-#define TETRIX_EC535_BLOCK_H
-
 #include <utility> // for pair
 #include <iostream> //everything else
 #include <cstdlib> //for rand
 #include <ctime>
 #include <vector>
+
+
+#ifndef TETRIX_EC535_BLOCK_H
+#define TETRIX_EC535_BLOCK_H
 
 #define RIGHT 1 // for rotating left
 #define LEFT 0 // for rotating right

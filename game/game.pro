@@ -8,5 +8,5 @@ DEPENDPATH += .
 INCLUDEPATH += /ad/eng/users/j/h/jhua/Tetrix_EC535/game/. .
 
 # Input
-HEADERS += block.h game.h gui.h grid.cpp score.cpp nextblock.cpp
-SOURCES += block.cpp game.cpp grid.cpp gui.cpp main.cpp nextblock.cpp score.cpp
+HEADERS += block.h game.h grid.cpp score.cpp nextblock.cpp
+SOURCES += block.cpp game.cpp grid.cpp main.cpp nextblock.cpp score.cpp
