@@ -319,7 +319,7 @@ void game::hardDrop(block * input, Grid grid){
 	installBlock(input, grid); // save block in state array & tetris grid
 }
 
-void game::update(QApplication * app, Grid grid, bool isRotate = false, int rotateDir = RIGHT, bool isXmove = false, int xDir = RIGHT, bool isHardDrop = false){
+void game::update(QApplication * app, Grid grid, bool isRotate, int rotateDir, bool isXmove, int xDir, bool isHardDrop){
     /* 
     Update game state: rotate vertically || horizontally OR rotate right || left  OR hard drop!
 

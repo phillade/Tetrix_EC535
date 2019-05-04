@@ -11,7 +11,6 @@
 
 //#include "grid.cpp"
 #include "score.cpp"
-#include "gui.h"
 
 #include "game.h"
 #include "block.h"
