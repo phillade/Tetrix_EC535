@@ -59,26 +59,11 @@ int main(int argc, char **argv)
     centralLayout->addWidget(gridWidget);
     centralLayout->addWidget(scoreLabel);
 	
-	//QPushButton * button = gui.getButton();
-	//centralLayout->addWidget(button);
-	//QLabel * buttonLabel = gui.getLabel();
-	//QPushButton * button = new QPushButton();
-	// button->
-	//
-
-	//gui * newgui = new gui(main, centralLayout);
-	//Gui gui;
-	//gui.setMachine(&Machine);
-	//QPushButton * button = gui.getButton();
-	//centralLayout->addWidget(button);
     // Add layout to main widget
     main->setLayout(centralLayout);
 	main->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     main->showFullScreen();
 
-	// Make Button
-	
-	//gui.showMaximized();
     
 	//Button stuff
 	int pFile, oflags;
@@ -134,34 +119,20 @@ int main(int argc, char **argv)
 		else
 			nb.placeBlock(Machine.getNextCoord(), Machine.getNextColor());
 
-
-		//Machine.displayGrid();
-		//int period = Machine.gameSpeed(&gameEnd);
-    
-		//Machine.update(app, newGrid);
-
-		// end early
-		/*
-		gameEnd++;
-        if (gameEnd > 50)
-			gameEnd = 0;
-		*/
-		////////////////////////
-		//sleep(period);
-		//app.processEvents();
-
+		//Speeding up game based on intervals of the threshold
 		if(thislvl != (score.getScore() / THRESHOLD)){
 			thislvl = score.getScore() / THRESHOLD;
 			write(pFile, "speed", 5);
 		}
 
-		if(trigger){
+		if(trigger){ //On receiving signal
 			trigger = 0;
 			rd = read(pFile, buffer, 10);
 			buffer[rd] = '\0';
 			//printf("%s\n", buffer);
 			sscanf(buffer, "%s %s",parsedButton, parsedTick);
 			if(!strcmp(parsedButton, "four")){
+				//rotate left
 				Machine.update(app, newGrid, true, LEFT);			
 			}
 			else if(!strcmp(parsedButton, "one")){
@@ -173,10 +144,11 @@ int main(int argc, char **argv)
 				Machine.update(app, newGrid, false, RIGHT, true, RIGHT);
 			}
 			else if(!strcmp(parsedButton, "six")){
-				//soft drop
+				//rotate right
 				Machine.update(app, newGrid, true, RIGHT);
 			}
 			else if(!strcmp(parsedButton, "seven")){
+				//restart
 				Machine.restart(newGrid);				
 				write(pFile, "reset", 5);
 			}
@@ -185,6 +157,7 @@ int main(int argc, char **argv)
 				Machine.update(app, newGrid, false, RIGHT, false, RIGHT, true);			
 			}
 			else if (!strcmp(parsedButton, "five")){
+				//Cycle through colors/modes
 				if (Machine.mode == 2)
 					Machine.mode = 0;
 				else
@@ -192,6 +165,7 @@ int main(int argc, char **argv)
 							
 			}
 			else if(!strcmp(parsedTick,"tick")){
+				//Translate block down
 				Machine.update(app, newGrid);
 				rowsRemoved = Machine.getRowsRemoved();
 				if (rowsRemoved > 0)

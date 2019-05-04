@@ -21,14 +21,16 @@
 
 MODULE_LICENSE("Dual BSD/GPL");
 
-#define GPIO_BUTTON_0 113
-#define GPIO_BUTTON_1 101
-#define GPIO_BUTTON_2 9
-#define GPIO_BUTTON_3 28
-#define GPIO_BUTTON_4 16
-#define GPIO_BUTTON_5 29
-#define GPIO_BUTTON_6 30
-#define GPIO_BUTTON_7 31
+
+//Assigning GPIO buttons 
+#define GPIO_BUTTON_0 113	//hard drop
+#define GPIO_BUTTON_1 101	//translate left
+#define GPIO_BUTTON_2 9		//soft drop
+#define GPIO_BUTTON_3 28	//translate right
+#define GPIO_BUTTON_4 16	//rotate left
+#define GPIO_BUTTON_5 29	//color cycle 
+#define GPIO_BUTTON_6 30	//rotate right
+#define GPIO_BUTTON_7 31	//reset
 
 
 /* Declaration of memory.c functions */
@@ -72,9 +74,9 @@ static int tetrix_len;
 static char last_button_press[10] = "";
 static char tick_trigger[10] = "";
 
-int active_button = 0;
-int active_tick = 0;
-int tick_time = 1000;
+int active_button = 0; //1 when button is pressed
+int active_tick = 0;	//1 when tick is triggered
+int tick_time = 1000; //Time between block translations
 
 /////////////////////////////
 static unsigned int capacity = 1000;
@@ -85,6 +87,7 @@ irqreturn_t gpio0_irq(int irq, void *dev_id, struct pt_regs *regs)
 {
 	strcpy(last_button_press,"zero");
 	active_button = 1;
+	//sending SIGIO signal
 	if (async_queue)
 		kill_fasync(&async_queue, SIGIO, POLL_IN);
 	return IRQ_HANDLED;
@@ -311,7 +314,7 @@ static ssize_t tetrix_write(struct file *filp, const char *buf,
 
 	//Parse data
 	if(!strcmp(tetrix_buffer, "speed")){
-		tick_time = tick_time - (tick_time / 3);
+		tick_time = tick_time - (tick_time / 3); //equation for speed up
 		printk(KERN_INFO "Current tick: %d", tick_time);
 		memset(tetrix_buffer, 0, capacity);
 		//mod_timer(&my_timer, jiffies + msecs_to_jiffies(tick_time));
